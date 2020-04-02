@@ -1,0 +1,27 @@
+name="opentitan"
+default_config = "test"
+#base_repos=["opentitan", "verilator"]
+base_repos=[]
+configs=["test"]
+workflow="readonly"
+env={TOOLS_DIR="%GRIP_ROOT_PATH%/tools"}
+logging="Yes"
+
+[config.test]
+repos=["verilator"]
+
+[repo.opentitan]
+url="https://github.com/lowRISC/opentitan.git"
+path="opentitan"
+branch="master"
+workflow="readonly"
+
+[repo.verilator]
+url="http://git.veripool.org/git/verilator"
+path="verilator"
+branch="v4.028"
+workflow="readonly"
+configure={exec="autoconf && ./configure --prefix=%TOOLS_DIR%/verilator"}
+install={exec="make && make install"}
+
+#[repo.riscv_tools]

@@ -2,19 +2,45 @@ name="opentitan"
 default_config = "test"
 #base_repos=["opentitan", "verilator"]
 base_repos=[]
-configs=["test"]
+configs=["test", "all"]
 workflow="readonly"
-env={TOOLS_DIR="%GRIP_ROOT_PATH%/tools"}
 logging="Yes"
+stages = ["download", "configure", "install"]
+
+[env]
+TOOLS_DIR="%GRIP_ROOT_PATH%/tools"
+BUILD_DIR="%GRIP_ROOT_PATH%/build"
 
 [config.test]
-repos=["verilator"]
+#repos=["verilator"]
+repos=["toolchains", "opentitan"]
+
+[config.all]
+repos=["verilator", "openocd", "opentitan"]
 
 [repo.opentitan]
 url="https://github.com/lowRISC/opentitan.git"
 path="opentitan"
 branch="master"
 workflow="readonly"
+oc_configure={exec="TOOLCHAIN_PATH=%TOOLS_DIR% BUILD_ROOT=%BUILD_DIR% ./meson_init.sh -f"}
+
+[repo.riscv-gnu-toolchain]
+url="https://github.com/riscv/riscv-gnu-toolchain"
+path="riscv-gnu-toolchain"
+download={exec="git submodule update --init --recursive"}
+configure={requires=["download"], exec="./configure --prefix=%TOOLS_DIR% --with-abi=ilp32 --with-arch=rv32imc --with-cmodel=medany"}
+
+[repo.toolchains]
+url = "https://github.com/atthecodeface/toolchain_building.git"
+path = "toolchains"
+doc = """
+The repository is used here to build cross-compiler, linker and assembler for RISC-V32 Elf,
+i.e. not a Linux-specific libc; this allows non-OS applications/tests to be built
+
+"""
+configure-riscv32-unknown-elf.satisfies="configure"
+install-riscv32-unknown-elf.satisfies="install"
 
 [repo.verilator]
 url="http://git.veripool.org/git/verilator"
@@ -22,6 +48,12 @@ path="verilator"
 branch="v4.028"
 workflow="readonly"
 configure={exec="autoconf && ./configure --prefix=%TOOLS_DIR%/verilator"}
-install={exec="make && make install"}
+install={exec="make -j6 && make install",requires=["configure"]}
 
-#[repo.riscv_tools]
+[repo.openocd]
+url="https://github.com/riscv/riscv-openocd.git"
+path="riscv-openocd"
+workflow="readonly"
+configure={exec="./bootstrap && mkdir -p %BUILD_DIR%/build-openocd && cd %BUILD_DIR%/build-openocd && %GRIP_REPO_PATH%/configure --enable-ftdi --enable-verbose-jtag-io --disable-vsllink --enable-remote-bitbang --prefix=%TOOLS_DIR%/openocd"}
+install={wd="%BUILD_DIR%/build-openocd", exec="make -j4 && make install", requires=["configure"]}
+

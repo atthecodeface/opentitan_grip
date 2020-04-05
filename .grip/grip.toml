@@ -42,6 +42,11 @@ i.e. not a Linux-specific libc; this allows non-OS applications/tests to be buil
 configure-riscv32-unknown-elf.satisfies="configure"
 install-riscv32-unknown-elf.satisfies="install"
 
+[repo.toolchains.configure-riscv32-unknown-elf.env]
+# GCC_CONFIG      = "--with-newlib=yes --disable-libssp"
+GCC_CONFIG      = "--with-abi=ilp32  --with-arch=rv32imc --enable-languages=c,c++ --with-system-zlib --with-newlib --with-sysroot=%TOOLS_DIR%/sysroot --disable-shared --disable-threads --disable-tls --disable-libmudflap --disable-libssp --disable-libquadmath --disable-libgomp --disable-nls --disable-tm-clone-registry "
+BINUTILS_CONFIG = "--disable-gold --enable-plugins --disable-werror --disable-gdb --disable-sim --disable-libdecnumber --disable-readline"
+
 [repo.verilator]
 url="http://git.veripool.org/git/verilator"
 path="verilator"

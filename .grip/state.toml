@@ -6,7 +6,7 @@ branch = "v4.028"
 changeset = "cbb15587dc782ac8ade7ae252e7b760cfba4a178"
 
 [test.toolchains]
-changeset = "1a1663c834b3d762444cd919912f000a5fb3aee7"
+changeset = "360f6a5f0756ebe30ffa78b4b56460a39696a7b7"
 
 [test.opentitan]
 changeset = "f9e7ffe25e858b4dd5f44869b10e918a57640811"
